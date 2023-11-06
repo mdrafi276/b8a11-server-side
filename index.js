@@ -24,6 +24,7 @@ async function run() {
   try {
     await client.connect();
     const  userCollection = client.db("roomDB").collection("userCollection");
+    const sitCollection = client.db("roomDB").collection("sitCollection");
 
 
 
@@ -64,12 +65,24 @@ async function run() {
 
      
  app.get('/rooms', async(req, res)=>{
-     const cursor = userCollection.find();
+     const cursor = userCollection.find({});
       const result = await cursor.toArray()
-      console.log(result);
       res.send(result)
  })
+ app.get('/roomSit/:id', async(req, res)=>{
+  const commonId = req.params.id;
+     const rooms = await sitCollection.find({commonId:commonId}).toArray();
+     res.send(rooms)
+ })
+ app.get('/rooms/:id', async(req, res)=>{
+  const Id = req.params.id;
+  const query = {roomId:Id};
+     const result = await userCollection.findOne(query);
+     res.send(result)
+ })
 
+ 
+ 
 
 
 
