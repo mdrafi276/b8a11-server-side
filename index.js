@@ -2,12 +2,18 @@ const express = require('express')
 const cors = require('cors')
 const app = express()
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
-const { JsonWebTokenError } = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
+const cookieParser = require('cookie-parser')
 app.use(cors());
 app.use(express.json());
+app.use(cookieParser());
 const port = process.env.PORT || 5000;
 
 require('dotenv').config();
+app.use(cors({
+  origin:['http://localhost:5173'],
+  credentials:true
+}))
 
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.6eaz3fu.mongodb.net/?retryWrites=true&w=majority`;
@@ -25,6 +31,7 @@ async function run() {
     await client.connect();
     const  userCollection = client.db("roomDB").collection("userCollection");
     const sitCollection = client.db("roomDB").collection("sitCollection");
+    const bookingCollection = client.db("roomDB").collection("bookingCollection");
 
 
 
@@ -52,7 +59,7 @@ async function run() {
 //   const token = req.cookies?.token;
 
 //   if (!token) {
-//     return res.this.status(401).send({ message: "token nai " });
+//     return res.this.status(401).send({ message: "unauthorized   token " });
 //   }
 //   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (error, decoded) => {
 //     if (error) {
@@ -81,9 +88,24 @@ async function run() {
      res.send(result)
  })
 
- 
- 
-
+  app.post('/myBooking', async(req, res) =>{
+      const booking = req.body;
+      const result = await bookingCollection.insertOne(booking); 
+      res.send(result)
+  });
+   app.get('/myBooking/:id', async (req, res) => {
+      const email = req.params.id;
+      const query = {userEmail:email}
+      const result = await bookingCollection.find(query).toArray();
+      res.send(result)
+    })
+  app.delete('/myBooking/:id', async (req, res) => {
+      const id  = req.params.id;
+     const query = {_id: (id)}
+      const result = await bookingCollection.deleteOne(query)
+      res.send(result)
+      ;
+    })
 
 
     await client.db("admin").command({ ping: 1 });
