@@ -32,6 +32,30 @@ async function run() {
     const  userCollection = client.db("roomDB").collection("userCollection");
     const sitCollection = client.db("roomDB").collection("sitCollection");
     const bookingCollection = client.db("roomDB").collection("bookingCollection");
+    const riviewColllection = client.db("roomDB").collection("riviewColllection");
+
+
+
+
+
+    app.post('/jwt', async (req, res) => {
+      const user = req.body;
+      console.log('tocken for ', user);
+      const token = jwt.sign(user, process.env.SECRET, { expiresIn: '1h' })
+      res.cookie('token', token, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+      })
+
+        .send({ success: true })
+
+    })
+
+    app.post('/logout', async (req, res) => {
+      const user = req.body;
+      res.clearCookie('token', { maxAge: 0 }).send({ success: true })
+    })
 
 
 
@@ -76,6 +100,21 @@ async function run() {
       const result = await cursor.toArray()
       res.send(result)
  })
+//  review 
+ app.post('/riview', async(req, res) =>{
+      const newsit = req.body;
+      console.log(newsit)
+      const result = await riviewColllection.insertOne(newsit); 
+      res.send(result)
+    })
+app.get('/riview', async(req, res) =>{
+      const cursor = riviewColllection
+.find();
+      const result = await cursor.toArray()
+      res.send(result)
+    })
+
+ 
  app.get('/roomSit/:id', async(req, res)=>{
   const commonId = req.params.id;
      const rooms = await sitCollection.find({commonId:commonId}).toArray();
@@ -101,22 +140,43 @@ async function run() {
     })
   app.delete('/myBooking/:id', async (req, res) => {
       const id  = req.params.id;
-     const query = {_id: (id)}
+     const query = {_id: new ObjectId (id)}
       const result = await bookingCollection.deleteOne(query)
       res.send(result)
       ;
     })
+app.get('/myBooking/:id', async(req, res) =>{
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id)}
+      const result = await bookingCollection.findOne(query)
+      res.send(result)
+     
+    })
 
-
+    app.put('/myBooking/:id', async(req , res) => {
+      console.log('hello');
+    const id = req.params.id;
+    const product = req.body;
+      const filter = {_id: new ObjectId(id)}
+      const option = {upsert:true} ;
+      const updateProduct = {
+        $set:{
+      name:product.roomSize,
+      type:product.prices,
+      price:product.sitId,
+      photo:product.Image,
+      
+        }
+      }
+      const result = await bookingCollection.updateOne(filter, updateProduct, option)
+      res.send(result)
+   })
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
-    // Ensures that the client will close when you finish/error
-    // await client.close();
   }
 }
 run().catch(console.dir);
-
 app.get('/', (req, res)=>{
     res.send("Hotel is running and Rafi vai is happy...........................")
 })
