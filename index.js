@@ -12,7 +12,7 @@ const port = process.env.PORT || 5000;
 require("dotenv").config();
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://hotel-projects-be67f.web.app/"],
+    origin: ["http://localhost:5173"],
     credentials: true,
   })
 );
@@ -45,7 +45,7 @@ app.post('/jwt', async(req, res)=>{
   const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
     expiresIn: "100h",
   })
-   Response.cookie("token", token, {
+   res.cookie("token", token, {
      httpOnly: true,
      sucure: false,
    }).send({ success: true });
