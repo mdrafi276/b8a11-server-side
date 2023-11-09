@@ -38,18 +38,32 @@ async function run() {
     const riviewColllection = client
       .db("roomDB")
       .collection("riviewColllection");
+      // jwt-token 
 app.post('/jwt', async(req, res)=>{
   const user = req.body;
   console.log(user);
   const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
     expiresIn: "100h",
-  });
+  })
+   Response.cookie("token", token, {
+     httpOnly: true,
+     sucure: false,
+   }).send({ success: true });
 })
+app.post('/jwtLogout',  async(req, res) =>{
+  const user = req.body;
+  console.log(user);
+  res.clearCookie('token', {maxAge:0}).send({message:'logOut'});
+});
+
    
 
     
     app.get("/rooms", async (req, res) => {
-      const cursor = userCollection.find({});
+      let sort = {};
+      const sortvalue = req.query.sortvalue
+      sort["price"] = sortvalue;
+      const cursor = userCollection.find({}).sort(sort) ;
       const result = await cursor.toArray();
       res.send(result);
     });
