@@ -38,58 +38,16 @@ async function run() {
     const riviewColllection = client
       .db("roomDB")
       .collection("riviewColllection");
+app.post('/jwt', async(req, res)=>{
+  const user = req.body;
+  console.log(user);
+  const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+    expiresIn: "100h",
+  });
+})
+   
 
-    // app.post("/jwt", async (req, res) => {
-    //   const user = req.body;
-    //   console.log("tocken for ", user);
-    //   const token = jwt.sign(user, process.env.SECRET, { expiresIn: "1h" });
-    //   res
-    //     .cookie("token", token, {
-    //       httpOnly: true,
-    //       secure: true,
-    //       sameSite: "none",
-    //     })
-    //     .send({ success: true });
-    // });
-
-    // app.post("/logout", async (req, res) => {
-    //   const user = req.body;
-    //   res.clearCookie("token", { maxAge: 0 }).send({ success: true });
-    // });
-
-    // app.post("/jwt", logger, (req, res) => {
-    //       const user = req.body;
-    //       const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
-    //         expiresIn: "1hr",
-    //       });
-    //       res
-    //         .cookie("token", token, {
-    //           httpOnly: true,
-    //           secure: false,
-    //         })
-    //         .send({ success: true });
-    //     });
-
-    //    const logger = (req, res, next) => {
-    //   console.log("we are at", req.host, req.originalUrl);
-    //   next();
-    // };
-
-    // const verifyToken = (req, res, next) => {
-    //   const token = req.cookies?.token;
-
-    //   if (!token) {
-    //     return res.this.status(401).send({ message: "unauthorized   token " });
-    //   }
-    //   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (error, decoded) => {
-    //     if (error) {
-    //       return res.this.status(401).send({ message: "token e Problem ache vai" });
-    //     }
-    //     req.user = decoded;
-    //     next();
-    //   });
-    // };
-
+    
     app.get("/rooms", async (req, res) => {
       const cursor = userCollection.find({});
       const result = await cursor.toArray();
@@ -107,7 +65,7 @@ async function run() {
       const result = await cursor.toArray();
       res.send(result);
     });
-
+// details 
     app.get("/roomSit/:id", async (req, res) => {
       const commonId = req.params.id;
       const rooms = await sitCollection.find({ commonId: commonId }).toArray();
@@ -131,12 +89,14 @@ async function run() {
       const result = await bookingCollection.find(query).toArray();
       res.send(result);
     });
+    // delete booking 
     app.delete("/myBooking/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await bookingCollection.deleteOne(query);
       res.send(result);
     });
+    // update bokking
     app.get("/update/:id", async (req, res) => {
       console.log("helllo");
       const id = req.params.id;
