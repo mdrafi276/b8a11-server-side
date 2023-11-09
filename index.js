@@ -29,7 +29,7 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    // await client.connect()
+    // await client.connect();
     const userCollection = client.db("roomDB").collection("userCollection");
     const sitCollection = client.db("roomDB").collection("sitCollection");
     const bookingCollection = client
@@ -53,7 +53,7 @@ app.post('/jwt', async(req, res)=>{
       const result = await cursor.toArray();
       res.send(result);
     });
-    //  review
+    //  revie
     app.post("/riview", async (req, res) => {
       const newsit = req.body;
       console.log(newsit);
