@@ -67,7 +67,7 @@ app.post('/jwtLogout',  async(req, res) =>{
       const result = await cursor.toArray();
       res.send(result);
     });
-    //  revie
+    //  revies
     app.post("/riview", async (req, res) => {
       const newsit = req.body;
       console.log(newsit);
